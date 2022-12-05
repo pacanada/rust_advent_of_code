@@ -11,7 +11,7 @@ fn solve_a(lines: Lines)->i32 {
     for line in lines {
         let a = line.split_once(" ").expect("something went wrong parsing play");
         let mut result = 0;
-        println!("{:?}", a);
+        //println!("{:?}", a);
         match a {
             ("A", "Y") => result = 2 + 6,
             ("A", "X") => result = 1 + 3,
@@ -34,7 +34,7 @@ fn solve_b(lines: Lines)->i32 {
     for line in lines {
         let a = line.split_once(" ").expect("something went wrong parsing play");
         let mut result = 0;
-        println!("{:?}", a);
+        //println!("{:?}", a);
         match a {
             ("A", "Y") => result = 1 + 3, // i need to draw
             ("A", "X") => result = 3 + 0, // i need to lose
