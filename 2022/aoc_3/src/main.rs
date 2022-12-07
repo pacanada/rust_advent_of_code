@@ -1,11 +1,4 @@
-use std::{str::{Lines, Chars}};
-
-// fn get_common_char<'a>(f: &'a str, l:&'a str)->&'a str {
-//     for bla in f.chars() {
-//        println!("{:?}", bla)
-//     }
-//     //f.chars().any(|c| l.contains(c))
-// }
+use std::{str::{Lines}};
 
 fn get_common_char<'a>(f: &'a str, l: &'a str) -> char  {
     let mut out: char = 'a';
