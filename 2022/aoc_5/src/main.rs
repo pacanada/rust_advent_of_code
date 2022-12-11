@@ -15,8 +15,19 @@ fn parse_instructions(lines: Lines) ->Vec<Vec<u32>>{
     for line in lines {
         if line.contains("move") {
             // keep the ones that are numbers
-            let numbers: String = line.chars().filter(|c| c.is_digit(10)).collect();
-            let instruction: Vec<u32> = numbers.chars().map(|c| c.to_digit(10).unwrap()).collect();
+            let parts: Vec<&str> = line.split(" ").collect();
+
+            let quantity: u32 = parts[1 as usize].parse().unwrap();
+            let initial_pile: u32 = parts[3 as usize].parse().unwrap();
+            let target_pile: u32 = parts[5 as usize].parse().unwrap();
+            let instruction = vec![quantity, initial_pile,target_pile];
+            // line
+            //     .find(|a: &str| a.parse())
+            //     .and_then(|a| a as u32);
+            // let numbers = line.split_whitespace().map(|s| s.parse::<u32>().expect("wrong"));
+            //let numbers = line.split(" ").into_iter().filter(|c: &str| c.is_numeric()).collect();
+            //let numbers: String = line.split(" ").filter(|c| c.is_numeric()).collect();
+            //let instruction: Vec<u32> = numbers.chars().map(|c| c.try_into()).collect();
             instructions.push(instruction);
             //dbg!(numbers);
         }
@@ -48,17 +59,29 @@ fn parse_stacks(lines: Lines) -> Vec<Vec<char>>{
         //dbg!(line);
     }
     array.reverse();
+    // println!("{:?}", array.len());
+    // println!("{:?}", array[0].len());
+    // println!("{:?}", array);
+    for row in &array {
+        println!("{:?}", row);
+    }
+
 
     // transpose it
     
     let mut transposed_array = Vec::new();
-    let max_height=8;// = array[0].len();
-    let n_piles=9; // = array.len();
+    let max_height = array.len();
+    let n_piles= array[0].len();
+    // println!("{:?}", max_height);
+    // println!("{:?}", n_piles);
     for i in 0..n_piles {
         let mut pile = Vec::new();
         for j in 0..max_height {
+            // println!("{}, {}", i,j);
             if array[j][i] != ' ' {
+                // println!("{}, {}", i,j);
                 pile.push(array[j][i])
+                
             }
             
         }
@@ -75,6 +98,7 @@ fn solve_a(lines: Lines)-> String {
     // what is the total number of piles
     let lines_ = lines.clone();
     let mut array = parse_stacks(lines);
+    println!("{:?}", array);
     // first index is pile, second is height
     // dbg!(array);
     // dbg!(array[0][0]);
@@ -83,6 +107,7 @@ fn solve_a(lines: Lines)-> String {
 
     let instructions = parse_instructions(lines_);
     for instruction in instructions {
+        println!("{:?}", instruction);
         let quantity = instruction[0];
         let initial_pile = instruction[1] - 1;
         let target_pile = instruction[2] - 1;
@@ -91,13 +116,25 @@ fn solve_a(lines: Lines)-> String {
         
 
         for i in 0..quantity {
+            
             buffer.push(array[initial_pile as usize].pop().expect("something worng")); 
+
+            
 
         }
         //dbg!(buffer);
         for i in buffer {
             array[target_pile as usize].push(i);
         }
+        // println!("after");
+        // let mut total = 0;
+        // for row in &array {
+        //     total +=row.len();
+        //     println!("{:?}", row);
+        //     //println!("{:?}", row.len())
+        // }
+        // println!("{:?}", total);
+        // count 
     }
 
     // crate on top
@@ -109,8 +146,42 @@ fn solve_a(lines: Lines)-> String {
     top
 }
 
-fn solve_b(lines: Lines)->&str {
-    ""
+fn solve_b(lines: Lines)->String {
+    let lines_ = lines.clone();
+    let mut array = parse_stacks(lines);
+
+    let instructions = parse_instructions(lines_);
+    for instruction in instructions {
+        println!("{:?}", instruction);
+        let quantity = instruction[0];
+        let initial_pile = instruction[1] - 1;
+        let target_pile = instruction[2] - 1;
+        let mut buffer = Vec::new();
+        //dbg!(quantity, initial_pile, target_pile);
+        
+
+        for i in 0..quantity {
+            
+            buffer.push(array[initial_pile as usize].pop().expect("something worng")); 
+
+            
+
+        }
+        buffer.reverse();
+        //dbg!(buffer);
+        for i in buffer {
+            array[target_pile as usize].push(i);
+        }
+
+    }
+
+    // crate on top
+    let mut top = String::new();
+    for mut pile in array {
+        top.push(pile.pop().expect("something wrong"));
+    }
+    
+    top
 }
 
 fn main() {
@@ -136,7 +207,7 @@ mod tests {
     fn question_b() {
         let lines = include_str!("input_test.txt").lines();
         let solution = solve_b(lines);
-        assert_eq!("", solution);
+        assert_eq!("MCD", solution);
     
 }
 }
