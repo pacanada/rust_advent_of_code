@@ -19,11 +19,7 @@ struct Cubes {
 }
 impl Cubes {
     fn is_contained_in(&self, other: &Cubes) -> bool {
-        if (self.color == other.color) & (self.qty < other.qty) {
-            return true;
-        } else {
-            return false;
-        }
+        (self.color == other.color) & (self.qty <= other.qty)
     }
 }
 impl FromStr for Cubes {
@@ -63,6 +59,9 @@ impl CubesBatch {
             .all(|x| x);
         is_contained
     }
+    fn get_power(self)->u32 {
+       self.cubes.iter().map(|cubes| cubes.qty as u32).product()
+    }
 }
 impl FromStr for CubesBatch {
     type Err = ParseError;
@@ -91,7 +90,7 @@ fn solve_a(lines: Lines) -> u32 {
 
     for (i, line) in lines.enumerate() {
         let mut split = line.split(":");
-        let game = split.next().unwrap();
+        let _ = split.next().unwrap();
         let batches = split.next().unwrap();
         //dbg!(&batches);
         let is_contained = batches
@@ -102,12 +101,61 @@ fn solve_a(lines: Lines) -> u32 {
             count+=i as u32+1;
 
         }
+
     }
     count
 }
+#[derive(Debug)]
+struct Game {
+    batches: Vec<CubesBatch>
+}
+impl FromStr for Game {
+    type Err = ParseError;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let batches = s
+        .split(";")
+        .map(|batch| batch.parse::<CubesBatch>().unwrap()).collect();
+    Ok(Game { batches })
+        
+    }
+}
+impl Game {
+    fn get_maximum(self) -> CubesBatch {
+        let mut max_qty_green = 0;
+        let mut max_qty_red = 0;
+        let mut max_qty_blue = 0;
+        for cubes_batch in self.batches {
+            for cube in cubes_batch.cubes {
+                match cube.color {
+                    Color::Blue => if cube.qty > max_qty_blue {max_qty_blue=cube.qty},
+                    Color::Green => if cube.qty > max_qty_green {max_qty_green=cube.qty},
+                    Color::Red => if cube.qty > max_qty_red {max_qty_red=cube.qty},
+                }
+            }
+
+            }
+        CubesBatch { cubes: vec![
+            Cubes {qty: max_qty_blue, color: Color::Blue}, 
+            Cubes {qty: max_qty_red, color: Color::Red},
+            Cubes {qty: max_qty_green, color: Color::Green}] }
+        }
+    
+    }
+
 
 fn solve_b(lines: Lines) -> u32 {
-    1
+    let mut sum = 0;
+    for line in lines {
+        let mut split = line.split(":");
+        let _ = split.next().unwrap();
+        let batches = split.next().unwrap();
+        let game = batches.parse::<Game>().unwrap();
+        let power = game.get_maximum().get_power();
+        sum+=power;
+        
+        
+    }
+    sum
 }
 
 #[cfg(test)]
@@ -123,6 +171,6 @@ mod tests {
     fn question_b() {
         let lines = include_str!("../../inputs/2023_2_b_example.txt").lines();
         let solution = solve_b(lines);
-        assert_eq!(281, solution);
+        assert_eq!(2286, solution);
     }
 }
