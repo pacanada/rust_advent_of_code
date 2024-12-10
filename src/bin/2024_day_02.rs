@@ -1,61 +1,71 @@
 use std::{collections::HashMap, str::Lines};
 
 fn main() {
-    let lines = include_str!("../../inputs/2024_02_example.txt").lines();
+    let lines = include_str!("../../inputs/2024_02.txt").lines();
     let solution_1: u32 = solve_part_1(lines.clone());
     println!("Part 1: {solution_1}");
     let solution_2: u32 = solve_part_2(lines);
     println!("Part 2: {solution_2}");
 }
 
-fn build_diff_vector(lines: Lines) -> Vec<Vec<i32>> {
-    let diff: Vec<Vec<i32>> = lines
-        .map(|line| {
-            line.split_whitespace()
-                .map(|x| x.parse().unwrap())
-                .collect()
-        })
-        .map(|x: Vec<i32>| x.windows(2).map(|y| y[1] - y[0]).collect())
-        .collect();
-    diff
-}
-
 fn is_safe(report: &Vec<i32>) -> bool {
-    report.iter().all(|x| (*x > 0) & (*x <= 3)) | report.iter().all(|x| (*x < 0) & (*x >= -3))
+    let mut all_dec = true;
+    let mut all_inc = true;
+    for i in 0..report.len()-1 {
+        let diff = report[i+1]- report[i];
+        if diff>0 {
+            all_dec=false;
+        }
+        if diff<0 {
+            all_inc=false;
+        }
+        if (diff.abs()>3) | (diff==0) {
+            return false;
+        }
+    }
+    (all_dec & !all_inc) | (!all_dec & all_inc)
 }
 fn is_safe_with_replacement(report: &Vec<i32>) -> bool {
-    println!("{:?}", report);
-    let mut carry =0;
-    let mut sign = report[0] > 0;
-    let mut skipped_one = false;
-    for x in report[1..report.len()].iter() {
-        let mut element = (*x).clone();
-        element+=carry;
-        carry=0;
-        if (sign != (element > 0)) | (element.abs() > 3) | (element==0) {
-            if !skipped_one {
-                carry = element;
-                skipped_one = true;
-                sign = element>0;
-                continue;
-            }
-            else {return false}
-
+    let report_length = report.len();
+    //println!("{:?}", report);
+    for i in 0..report_length {
+        //println!("{:?}", [&report[..i], &report[i+1..]]);
+        // Report: 
+        // [7, 6, 4, 2, 1]
+        // Combinations checked (if any is safe, the report is safe) -> O(N*T^2)
+        // [[], [6, 4, 2, 1]]
+        // [[7], [4, 2, 1]]
+        // [[7, 6], [2, 1]]
+        // [[7, 6, 4], [1]]
+        // [[7, 6, 4, 2], []]
+        if is_safe(&[&report[..i], &report[i+1..]].concat()) {
+            return true;
         }
 
     }
-    true
+    false
+    
+
+}
+fn parse(lines: Lines) -> Vec<Vec<i32>> {
+    lines.map(|line| {
+        line.split_whitespace()
+            .map(|x| x.parse().unwrap())
+            .collect()
+    }).collect()
 
 }
 
 fn solve_part_1(lines: Lines) -> u32 {
-    let diff = build_diff_vector(lines);
-    diff.iter().filter(|&report| is_safe(report)).count() as u32
+    let reports: Vec<Vec<i32>> = parse(lines);
+    reports.iter().filter(|&report| is_safe(report)).count() as u32
 }
 
 fn solve_part_2(lines: Lines) -> u32 {
-    let diff = build_diff_vector(lines);
-    diff.iter().filter(|&report| is_safe_with_replacement(report)).count() as u32
+    let reports: Vec<Vec<i32>> = parse(lines);
+    reports.iter().filter(|&report| is_safe_with_replacement(report)).count() as u32
+    //diff.iter().inspect(|&x| println!("{:?}: {}", x,is_safe_with_replacement(x) )).filter(|&report| is_safe_with_replacement(report)).count() as u32
+    
 }
 
 #[cfg(test)]
