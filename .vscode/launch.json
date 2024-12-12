@@ -81,6 +81,42 @@
         {
             "type": "lldb",
             "request": "launch",
+            "name": "Debug executable '2024_day_03'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=2024_day_03",
+                    "--package=aoc"
+                ],
+                "filter": {
+                    "name": "2024_day_03",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable '2024_day_04'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=2024_day_04",
+                    "--package=aoc"
+                ],
+                "filter": {
+                    "name": "2024_day_04",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
             "name": "Debug unit tests in executable '2024_day_02'",
             "cargo": {
                 "args": [
