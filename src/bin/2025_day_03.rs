@@ -1,7 +1,7 @@
 use std::str::Lines;
 
 fn main() {
-    let lines = include_str!("../../inputs/2025_03_example.txt").lines();
+    let lines = include_str!("../../inputs/2025_03.txt").lines();
     let solution_1: u32 = solve_part_1(lines.clone());
     println!("Part 1: {solution_1}");
     let solution_2: u32 = solve_part_2(lines);
@@ -13,13 +13,25 @@ fn parse_vec_from_line(line: &str)-> Vec<u32> {
     v
 }
 fn solve_part_1(lines: Lines) -> u32 {
+    // brute force
+    let mut max_accum = 0;
     for line in lines {
+        let mut max = 0;
         let v = parse_vec_from_line(line);
-        println!("{:?}", v);
-        println!("{}", v.iter().max().unwrap())
+        for (i, first_digit) in v.iter().enumerate() {
+            for second_digit in &v[i+1..] {
+                let num = first_digit*10+second_digit;
+                if num>max {
+                    max=num;
+                }
 
-    }
-    0
+            }
+        }
+        println!("{max}: {:?}", v);
+        max_accum+=max;
+        }
+
+    max_accum
 }
 
 fn solve_part_2(lines: Lines) -> u32 {
@@ -33,7 +45,7 @@ mod tests {
     fn question_a() {
         let lines = include_str!("../../inputs/2025_03_example.txt").lines();
         let solution = solve_part_1(lines);
-        assert_eq!(2, solution);
+        assert_eq!(357, solution);
     }
     #[test]
     fn question_b() {
