@@ -57,17 +57,20 @@ fn parse_to_array_of_vec_struct(v: Vec<u32>)-> HashMap<u32, Vec<usize>> {
 
 fn is_possible(h: &HashMap<u32, Vec<usize>>, number: u64)->bool {
     let vec_of_digits = parse_vec_from_line(&number.to_string());
-    let mut last_index = 0;
+    let mut last_index: i32 = -1;
     for digit in vec_of_digits {
+        //println!("Considering {digit}. Last index {last_index}");
         if let Some(vec_pos) = h.get(&digit) {
             let mut next_position = None;
             for i in vec_pos {
-                if i> &last_index {
+                if *i as i32> last_index {
                     next_position = Some(i);
+                    //println!("{:?}", next_position);
+                    break
                 }
             }
             if next_position.is_some() {
-                last_index = *next_position.unwrap() as usize;
+                last_index = *next_position.unwrap() as i32;
             } else {
                 return false
             }
@@ -82,8 +85,10 @@ fn is_possible(h: &HashMap<u32, Vec<usize>>, number: u64)->bool {
 fn max_number_of_n_digits(h: &HashMap<u32, Vec<usize>>, n: u32)->u64{
     //let mut h2 = h.clone();
     println!("{}-{}", 10_u64.pow(n+1)-1,10_u64.pow(n) );
-    for i in (10_u64.pow(n)..10_u64.pow(n+1)-1).rev() {
-        println!("Testing {i}");
+    println!("{:?}", h);
+    println!("{}", is_possible(h, 987654321111));
+    for i in (10_u64.pow(n-1)..10_u64.pow(n)-1).rev() {
+        //println!("Testing {i}");
         if is_possible(h, i) {
             return i
         }
@@ -95,13 +100,31 @@ fn max_number_of_n_digits(h: &HashMap<u32, Vec<usize>>, n: u32)->u64{
     }
 0
 }
+
+fn find_max_of_vector(v: &[u32]) -> Option<(u32, usize)> {
+    let max = v.iter().max();
+    if !max.is_some() {
+        return None
+    }
+    let max = max.unwrap();
+    let pos = v.iter().position(|x| x==max).unwrap();
+    Some((*max, pos))
+
+}
+
 fn solve_part_2(lines: Lines) -> u64 {
     let mut max_accum = 0;
     for line in lines {
 
         let v = parse_vec_from_line(line);
+        // backtracking?
+        println!("{:?}", find_max_of_vector(&v[..]));
+        println!("{:?}", find_max_of_vector(&v[1..]));
         let h = parse_to_array_of_vec_struct(v);
-        max_accum+=max_number_of_n_digits(&h, 12);
+        println!("{}", line);
+        // other approach
+        // find maximum of the remaining of vector, and repeat until we have n digits, if not, reduce by one the last searched 
+        // max_accum+=max_number_of_n_digits(&h, 12);
         //println!("{:?}", h);
         // what is the max number in order of 12 elements
     }
